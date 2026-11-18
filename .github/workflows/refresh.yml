@@ -67,3 +67,18 @@ jobs:
 
       - id: deployment
         uses: actions/deploy-pages@v4
+
+      # DSH gives an index source 15 seconds. Warm both copies so the next reader gets a cache hit
+      # instead of paying the first-request cost of a freshly published file.
+      - name: Warm the CDN and Pages copies
+        run: |
+          jsdelivr="https://cdn.jsdelivr.net/gh/${{ github.repository }}@main/dist/index.json"
+          pages="https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/index.json"
+          for attempt in 1 2 3 4 5; do
+            if curl -sS --compressed -o /dev/null -w "jsdelivr: %{http_code} in %{time_total}s\n" "$jsdelivr"; then break; fi
+            sleep 10
+          done
+          for attempt in 1 2 3; do
+            if curl -sS --compressed -o /dev/null -w "pages: %{http_code} in %{time_total}s\n" "$pages"; then break; fi
+            sleep 10
+          done

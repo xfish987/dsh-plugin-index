@@ -46,7 +46,7 @@ const CONFIG = {
   /** Download counts move slowly and the npm API rate-limits hard, so keep them far longer than packuments. */
   downloadsTtlMs: 7 * 24 * 60 * 60 * 1000,
   seedTtlMs: 6 * 60 * 60 * 1000,
-  maxVersionsPerPlugin: Number(option('--max-versions', '12')),
+  maxVersionsPerPlugin: Number(option('--max-versions', '8')),
   searchPages: Number(option('--search-pages', '21')),
   searchRecentDays: Number(option('--recent-days', '90')),
   seedUrls: [
@@ -479,7 +479,7 @@ function buildIndex(metas, downloads) {
     }
     if (meta.keywords.length > 0) metadata.keywords = meta.keywords;
 
-    const description = typeof meta.description === 'string' ? meta.description.trim().slice(0, 500) : '';
+    const description = typeof meta.description === 'string' ? meta.description.trim().slice(0, 400) : '';
     // Re-sanitize at build time: cached metas may predate the current normalization rules.
     const repository = normalizeRepository(meta.repository);
     const homepage = normalizeHomepage(meta.homepage);
