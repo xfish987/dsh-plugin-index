@@ -1,0 +1,61 @@
+name: Refresh index
+
+on:
+  schedule:
+    # Every 6 hours, off the top of the hour to avoid the cron rush.
+    - cron: '17 */6 * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: refresh-index
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - run: npm ci
+
+      - name: Build index
+        env:
+          INDEX_URL: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/index.json
+        run: npm run build
+
+      - name: Validate index
+        run: npm run validate
+
+      - name: Commit the refreshed index
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if git diff --quiet -- dist/index.json; then
+            echo "index unchanged"
+          else
+            git add dist/index.json
+            git commit -m "chore: refresh index $(date -u +%Y-%m-%dT%H:%MZ)"
+            git push
+          fi
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+      - id: deployment
+        uses: actions/deploy-pages@v4

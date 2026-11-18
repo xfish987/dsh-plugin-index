@@ -1,0 +1,20 @@
+{
+  "name": "dsh-plugin-index",
+  "version": "0.1.0",
+  "private": true,
+  "description": "A self-hosted, auto-refreshed DSH plugin market index (format 1), generated from the public npm registry.",
+  "type": "module",
+  "engines": {
+    "node": ">=22.19"
+  },
+  "scripts": {
+    "build": "node build-index.mjs",
+    "build:fresh": "node build-index.mjs --no-cache",
+    "validate": "node validate-index.mjs",
+    "serve": "node serve.mjs"
+  },
+  "dependencies": {
+    "@deepseek-ai/dsh-plugin-market-index": "0.2.1-alpha.4",
+    "semver": "^7.7.3"
+  }
+}
