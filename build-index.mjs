@@ -43,6 +43,8 @@ const CONFIG = {
   requestTimeoutMs: 30_000,
   retries: 4,
   packumentTtlMs: Number(option('--packument-ttl', String(6 * 60 * 60 * 1000))),
+  /** Download counts move slowly and the npm API rate-limits hard, so keep them far longer than packuments. */
+  downloadsTtlMs: 7 * 24 * 60 * 60 * 1000,
   seedTtlMs: 6 * 60 * 60 * 1000,
   maxVersionsPerPlugin: Number(option('--max-versions', '12')),
   searchPages: Number(option('--search-pages', '21')),
@@ -355,7 +357,7 @@ async function fetchDownloads(names) {
   const pending = [];
   for (const name of names) {
     const entry = cached[name];
-    if (entry && Date.now() - entry.at < CONFIG.packumentTtlMs) {
+    if (entry && Date.now() - entry.at < CONFIG.downloadsTtlMs) {
       if (typeof entry.downloads === 'number') downloads.set(name, entry.downloads);
     } else {
       pending.push(name);
@@ -468,8 +470,11 @@ function buildIndex(metas, downloads) {
 
     const weekly = downloads.get(meta.name);
     const metadata = {};
+    // `updated` is complete for every plugin; `downloads` is best effort because the npm API rate-limits.
+    const newest = versions.reduce((max, version) => Math.max(max, version.publishTimestamp), 0);
+    metadata.sortKeys = { updated: newest };
     if (weekly != null) {
-      metadata.sortKeys = { downloads: weekly };
+      metadata.sortKeys.downloads = weekly;
       metadata.labels = labelsFor(weekly);
     }
     if (meta.keywords.length > 0) metadata.keywords = meta.keywords;
@@ -497,7 +502,10 @@ function buildIndex(metas, downloads) {
     description: CONFIG.description,
     metadata: {
       labels: Object.fromEntries(Object.entries(CONFIG.labels).map(([id, title]) => [id, { title }])),
-      sortKeys: { downloads: { title: { en: 'Weekly downloads', zh: '周下载量' }, order: 'desc' } },
+      sortKeys: {
+        updated: { title: { en: 'Last release', zh: '最近发布' }, order: 'desc' },
+        downloads: { title: { en: 'Weekly downloads', zh: '周下载量' }, order: 'desc' },
+      },
     },
     plugins,
   };
