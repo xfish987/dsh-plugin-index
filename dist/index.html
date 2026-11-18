@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="zh-CN">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DSH 插件索引 · dsh-plugin-index</title>
+<style>
+  :root { color-scheme: light dark; }
+  body {
+    max-width: 46rem; margin: 4rem auto; padding: 0 1.25rem;
+    font: 16px/1.7 ui-sans-serif, -apple-system, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    color: #1f2328; background: #fdfdfc;
+  }
+  h1 { font-size: 1.6rem; margin: 0 0 .25rem; letter-spacing: -0.01em; }
+  p.lead { color: #5b6270; margin-top: 0; }
+  code, a { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
+  code { background: #f1f2f4; padding: .15em .4em; border-radius: .3em; font-size: .9em; }
+  a { color: #1668c9; }
+  ul { padding-left: 1.1rem; }
+  li { margin: .35rem 0; }
+  hr { border: 0; border-top: 1px solid #e6e7ea; margin: 2rem 0; }
+  small { color: #6b7280; }
+  @media (prefers-color-scheme: dark) {
+    body { color: #e6e6e3; background: #14161a; }
+    p.lead, small { color: #9aa1ad; }
+    code { background: #22262c; }
+    a { color: #6cb0ff; }
+    hr { border-top-color: #2a2f36; }
+  }
+</style>
+
+<h1>DSH 插件索引</h1>
+<p class="lead">一份自托管的 DeepSeek Harness 插件市场索引（format 1），从公开的 npm registry 元数据生成，每 6 小时自动重建。</p>
+
+<p><strong>索引地址</strong><br><a href="index.json">https://xfish987.github.io/dsh-plugin-index/index.json</a></p>
+
+<p>在 DSH 里加：<strong>Plugins → Discover → Index sources</strong>，粘贴上面的地址即可。</p>
+
+<hr>
+
+<ul>
+  <li>只收录 <code>package.json</code> 里声明了 <code>dsh.bundle</code> 的版本 —— 没声明的包装进 profile 也不会装配。</li>
+  <li><code>engines.dsh</code> 优先取版本自己的声明，否则取 <code>@deepseek-ai/dsh*</code> peer 范围的交集。</li>
+  <li>按 npm 周下载量排序与打标签；每个插件最多保留 12 个版本。</li>
+  <li>源码与构建脚本：<a href="https://github.com/xfish987/dsh-plugin-index">github.com/xfish987/dsh-plugin-index</a></li>
+</ul>
+
+<p><small>索引数据来自 npm 的公开元数据，版权归各包作者。构建脚本以 MIT 许可发布。</small></p>
+</html>
